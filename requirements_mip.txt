@@ -1,0 +1,9 @@
+# typing support
+__future__
+github:josverl/micropython-stubs/mip/typing.mpy
+github:josverl/micropython-stubs/mip/typing_extensions.mpy
+
+# 
+usb-device-keyboard
+logging
+
