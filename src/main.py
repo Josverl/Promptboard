@@ -18,12 +18,13 @@ def stop_boot():
 
 
 # wait 5 seconds before starting the keyboard example
-for i in range(3):
+delay = 3
+for i in range(delay):
     if stop_boot():
         print("Exiting boot")
         break
 
-    print("Starting keyboard example in %d seconds" % (5 - i))
+    print("Starting keyboard example in %d seconds" % (delay - i))
     time.sleep(1)
 
 # import the keyboard example

@@ -1,11 +1,13 @@
 """
 Translate text to keycodes for USB HID devices.
-"""	
+"""
+
 # Based on : https://github.com/isoxliis/firmware-micropython/blob/main/isoxliis_macro.py
 # Copyright (c) 2024 Jos Verlinde
 # Copyright (c) 2024 isoxliis
 # MIT License
 
+import random
 import time
 from usb.device.keyboard import KeyCode as KC
 
@@ -60,11 +62,15 @@ DO_NOTHING = -1
 def wait(delay):
     if delay == 0:
         return
+    if delay < 0:
+        delay = random.randint(0, -delay)
+
     t_until = time.ticks_ms() + delay
-    if time.ticks_diff(t_until, time.ticks_ms()) > 0:
-        yield 0
+
     while time.ticks_diff(t_until, time.ticks_ms()) > 0:
-        yield DO_NOTHING
+        time.sleep_ms(1)
+        # yield DO_NOTHING
+
 
 def hold(key, delay, auto_release=True):
     t_until = time.ticks_ms() + delay
@@ -82,6 +88,7 @@ def repeat(key, times, delay=0):
 
 
 def scancode(char: str):
+    assert len(char) == 1 , "scancode: Only single characters are supported"
     upper = char.isupper()
     char_ = ord(char.lower())
     if char_ in a_to_z:
@@ -99,14 +106,15 @@ def scancode(char: str):
         return 0
 
 
-def text(text: str, delay: int = 100):
-    """ 
+def as_keychords(text: str, delay: int = 100):
+    """
     Translate text to keycodes for USB HID devices.
     :param text: The text to translate.
     :param delay: The delay between each key press.
 
     :return: A generator that yields keycodes, tuples of keycodes.
     """
+    assert isinstance(text, str), f"as_keychords: text must be a string not {type(text)}"
     delay = max(0, delay)
     last_key = None
     for char in text:
