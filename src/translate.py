@@ -106,7 +106,7 @@ def scancode(char: str):
         return 0
 
 
-def as_keychords(text: str, delay: int = 100):
+def as_keychords(text: str, delay: int = 100, crlf = False):
     """
     Translate text to keycodes for USB HID devices.
     :param text: The text to translate.
@@ -115,6 +115,11 @@ def as_keychords(text: str, delay: int = 100):
     :return: A generator that yields keycodes, tuples of keycodes.
     """
     assert isinstance(text, str), f"as_keychords: text must be a string not {type(text)}"
+
+    if not crlf:
+        # Replace all newlines and tabs with spaces
+        text = text.replace("\n", " ").replace("\r", " ").replace("\t", " ")
+    
     delay = max(0, delay)
     last_key = None
     for char in text:
