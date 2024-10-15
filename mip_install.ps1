@@ -8,6 +8,10 @@ foreach ($package in $packages) {
     }  
 }
 
+if len($packages) -gt 0 {
+    # reset just to make sure
+    mpremote reset 
+}
 
 
 
