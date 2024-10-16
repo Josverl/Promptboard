@@ -9,21 +9,21 @@ Translate text to keycodes for USB HID devices.
 
 import random
 import time
+
+from textwrap_dedent import dedent
 from usb.device.keyboard import KeyCode as KC
-
-from dedent import dedent
-
 
 a_to_z = range(ord("a"), ord("z") + 1)
 one_to_nine = range(ord("1"), ord("9") + 1)
-SEMICOLON = 51  # ; :
-GRAVE = 53  # ` ~
 
 charmap = {
-    # additional Common Keys 
+    # additional Common Keys
     9: KC.TAB,  # \t
     # 10: KC.ENTER
-    10: (KC.LEFT_SHIFT,KC.ENTER), # Shift-Enter gives LF without Sending(Enter) the prompt in Copilot 
+    10: (
+        KC.LEFT_SHIFT,
+        KC.ENTER,
+    ),  # Shift-Enter gives LF without Sending(Enter) the prompt in Copilot
     32: KC.SPACE,
     33: (KC.LEFT_SHIFT, KC.N1),  # !
     34: (KC.LEFT_SHIFT, KC.QUOTE),  # "
@@ -40,8 +40,8 @@ charmap = {
     45: KC.MINUS,  # -
     46: KC.DOT,  # .
     47: KC.SLASH,  # /
-    58: (KC.LEFT_SHIFT, SEMICOLON),
-    59: SEMICOLON,
+    58: (KC.LEFT_SHIFT, KC.COLON),
+    59: KC.COLON,
     60: (KC.LEFT_SHIFT, KC.COMMA),  # <
     61: KC.EQUAL,
     62: (KC.LEFT_SHIFT, KC.DOT),  # >
@@ -55,7 +55,7 @@ charmap = {
     123: (KC.LEFT_SHIFT, KC.OPEN_BRACKET),  # {
     124: (KC.LEFT_SHIFT, KC.BACKSLASH),  # |
     125: (KC.LEFT_SHIFT, KC.CLOSE_BRACKET),  # }
-    126: (KC.LEFT_SHIFT, GRAVE),  # ~
+    126: (KC.LEFT_SHIFT, KC.TILDE),  # ` ~
     163: (KC.LEFT_SHIFT, KC.N3),  # £
 }
 
@@ -63,11 +63,11 @@ charmap = {
 DO_NOTHING = -1
 
 
-def wait(delay):
+def wait(delay: int):
     if delay == 0:
         return
     if delay < 0:
-        delay = random.randint(0, -delay)
+        delay = random.randint(5, -delay)
 
     t_until = time.ticks_ms() + delay
 
@@ -76,7 +76,7 @@ def wait(delay):
         # yield DO_NOTHING
 
 
-def hold(key, delay, auto_release=True):
+def hold(key, delay: int, auto_release=True):
     t_until = time.ticks_ms() + delay
     while time.ticks_diff(t_until, time.ticks_ms()) > 0:
         yield key
@@ -84,7 +84,7 @@ def hold(key, delay, auto_release=True):
         yield 0
 
 
-def repeat(key, times, delay=0):
+def repeat(key, times, delay: int = 0):
     for _ in range(times):
         yield key
         yield 0
@@ -92,7 +92,7 @@ def repeat(key, times, delay=0):
 
 
 def scancode(char: str):
-    assert len(char) == 1 , "scancode: Only single characters are supported"
+    assert len(char) == 1, "scancode: Only single characters are supported"
     upper = char.isupper()
     char_ = ord(char.lower())
     if char_ in a_to_z:
@@ -110,7 +110,7 @@ def scancode(char: str):
         return 0
 
 
-def as_keychords(text: str, delay: int = 100):
+def as_keychords(text: str, delay: int = -100):
     """
     Translate text to keycodes for USB HID devices.
     :param text: The text to translate.
@@ -128,8 +128,7 @@ def as_keychords(text: str, delay: int = 100):
     indent = len(lines[0]) - len(lines[0].lstrip())
     text = "\n".join(line[indent:] for line in lines)
 
-
-    delay = max(0, delay)
+    # delay = max(0, delay)
     last_key = None
     for char in text:
         sc = scancode(char)
@@ -147,5 +146,3 @@ def as_keychords(text: str, delay: int = 100):
             yield sc
         if delay:
             yield wait(delay)
-
-

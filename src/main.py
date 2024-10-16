@@ -1,6 +1,4 @@
-import time
 from machine import Pin
-
 
 STOP_BOOT_KEYS = [Pin.cpu.GPIO19, Pin.cpu.GPIO14]
 
@@ -29,6 +27,6 @@ def stop_boot():
 
 # import the keyboard example
 if not stop_boot():
-    from kb import *
-    run_keyboard()
+    from kb import *  # type: ignore  # noqa: F403
 
+    run_keyboard()  # noqa: F405
