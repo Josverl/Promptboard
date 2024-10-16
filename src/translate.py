@@ -11,6 +11,8 @@ import random
 import time
 from usb.device.keyboard import KeyCode as KC
 
+from dedent import dedent
+
 
 a_to_z = range(ord("a"), ord("z") + 1)
 one_to_nine = range(ord("1"), ord("9") + 1)
@@ -18,8 +20,10 @@ SEMICOLON = 51  # ; :
 GRAVE = 53  # ` ~
 
 charmap = {
+    # additional Common Keys 
     9: KC.TAB,  # \t
-    10: KC.ENTER,
+    # 10: KC.ENTER
+    10: (KC.LEFT_SHIFT,KC.ENTER), # Shift-Enter gives LF without Sending(Enter) the prompt in Copilot 
     32: KC.SPACE,
     33: (KC.LEFT_SHIFT, KC.N1),  # !
     34: (KC.LEFT_SHIFT, KC.QUOTE),  # "
@@ -106,7 +110,7 @@ def scancode(char: str):
         return 0
 
 
-def as_keychords(text: str, delay: int = 100, crlf = False):
+def as_keychords(text: str, delay: int = 100):
     """
     Translate text to keycodes for USB HID devices.
     :param text: The text to translate.
@@ -116,10 +120,15 @@ def as_keychords(text: str, delay: int = 100, crlf = False):
     """
     assert isinstance(text, str), f"as_keychords: text must be a string not {type(text)}"
 
-    if not crlf:
-        # Replace all newlines and tabs with spaces
-        text = text.replace("\n", " ").replace("\r", " ").replace("\t", " ")
-    
+    # trim leading empty lines
+    text = dedent(text.lstrip("\r\n"))
+
+    # unindent text
+    lines = text.split("\n")
+    indent = len(lines[0]) - len(lines[0].lstrip())
+    text = "\n".join(line[indent:] for line in lines)
+
+
     delay = max(0, delay)
     last_key = None
     for char in text:
@@ -138,3 +147,5 @@ def as_keychords(text: str, delay: int = 100, crlf = False):
             yield sc
         if delay:
             yield wait(delay)
+
+
