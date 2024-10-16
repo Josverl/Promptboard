@@ -1,5 +1,5 @@
 # ignore pycache
-**/**py*
+**/__py*
 
 # No typingas, but do include the typings.usb as they are not included
 typings/*
