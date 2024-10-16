@@ -6,4 +6,5 @@
 # 
 usb-device-keyboard
 logging
+aiorepl
 

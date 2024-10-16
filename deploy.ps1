@@ -13,6 +13,7 @@ Copy-Item -Path "e:\config.py" -Destination "e:\$backupFileName" -Force -Verbose
 
 # copy Source to Target
 copy -Force -Verbose -Path .\src\* -Destination e:\
+copy -Force -Verbose -Path .\src\lib\primitives\* -Destination e:\lib\primitives\*.*
 
 # final resets
 mpremote reset 

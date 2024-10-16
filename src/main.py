@@ -1,5 +1,7 @@
 import time
 from machine import Pin
+import asyncio
+import aiorepl
 
 
 STOP_BOOT_KEYS = [Pin.cpu.GPIO19, Pin.cpu.GPIO14]
@@ -17,18 +19,25 @@ def stop_boot():
     return False
 
 
-# # wait 5 seconds before starting the keyboard example
-# delay = 3
-# for i in range(delay):
-#     if stop_boot():
-#         print("Exiting boot")
-#         break
+async def task1():
+    while True:
+        print("task 1")
+        await asyncio.sleep_ms(500)
+    print("done")
 
-#     print("Starting keyboard example in %d seconds" % (delay - i))
-#     time.sleep(1)
+
+async def as_main():
+    print("Starting tasks...")
+
+    # Start other program tasks.
+    t1 = asyncio.create_task(task1())
+
+    # Start the aiorepl task.
+    repl = asyncio.create_task(aiorepl.task())
+
+    await asyncio.gather(t1, repl)
+
 
 # import the keyboard example
 if not stop_boot():
-    from kb import *
-    run_keyboard()
-
+    asyncio.run(as_main())
